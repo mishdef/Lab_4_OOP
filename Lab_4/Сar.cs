@@ -1,4 +1,6 @@
-﻿namespace Lab_4
+﻿using System.Runtime.CompilerServices;
+
+namespace Lab_4
 {
     internal class Car
     {
@@ -18,9 +20,42 @@
 
         bool _isStarted = false;
         double _currentSpeed = 0;
+
+        //newwwwwwwwwwwww
+        static int _count = 0;
+
+        static double _totalMilage = 0;
+        static double _totalFuelConsumption = 0;
+        static double _totalConsumedFuelPrice = 0;
+        static double _fuelPrice = 2;
+        //newwwwwwwwwwwww
+
         #endregion
 
         #region Properties
+
+        //newwwwwwwwwwwww
+        public static int Count { get { return _count; } }
+
+        public static double TotalMilage { get { return _totalMilage; } }
+        public static double TotalFuelConsumption { get { return _totalFuelConsumption; } }
+        public static double TotalConsumedFuel { get { return _totalFuelConsumption; } }
+        public static double TotalConsumedFuelPrice { get { return _totalConsumedFuelPrice; } }
+        
+        public static double FuelPrice 
+        { 
+            get 
+            { 
+                return _fuelPrice; 
+            } 
+            set 
+            { 
+                if (value < 0) throw new ArgumentException("Fuel price cannot be negative.");
+                _fuelPrice = value; 
+            } 
+        }
+        //newwwwwwwwwwwww
+
         public int NumberOfDoors
         {
             get { return _numberOfDoors; }
@@ -190,11 +225,15 @@
             Mark = mark;
             Model = model;
             Color = color;
+
+            _count++;
         }
 
         public Car(string mark, string model, Color color, float horsePower, decimal weight, double milage, double fuelCapacity, DateTime productionDate, double fuelConsumptionPer100km, int numberOfDoors)
-            : this(mark, model, color)
         {
+            Mark = mark;
+            Model = model;
+            Color = color;
             HorsePower = horsePower;
             Weight = weight;
             Milage = milage;
@@ -202,9 +241,11 @@
             ProductionDate = productionDate;
             FuelConsumptionPer100km = fuelConsumptionPer100km;
             NumberOfDoors = numberOfDoors;
+
+            _count++;
         }
 
-        public Car(string strInfo)
+        private Car(string strInfo)
         {
             var info = strInfo.Split('╬', StringSplitOptions.RemoveEmptyEntries).ToArray();
             Mark = info[0];
@@ -217,10 +258,72 @@
             ProductionDate = DateTime.Parse(info[7]);
             FuelConsumptionPer100km = double.Parse(info[8]);
             NumberOfDoors = int.Parse(info[9]);
+
+            _count++;
         }
         #endregion
 
         #region Methods
+
+        static public string ResetCountres()
+        {
+            _totalConsumedFuelPrice= 0;
+            _totalFuelConsumption = 0;
+            _totalMilage = 0;
+
+            return "The countres has been reset.";
+        }
+
+        static public string ShowCountres()
+        {
+            return $"Total consumed fuel price: {_totalConsumedFuelPrice}$. Total fuel consumption: {_totalFuelConsumption} liters. Total milage: {_totalMilage} km.";
+        }
+
+        static public Car Parse(string strInfo)
+        {
+            if (string.IsNullOrEmpty(strInfo))
+            {
+                throw new ArgumentException("Invalid string. Cannot be parsed to Car object.");
+            }
+            if (strInfo.Split('╬').Length != 10)
+            {
+                throw new ArgumentException("Invalid string. Cannot be parsed to Car object.");
+            }
+
+
+
+            try
+            {
+                return new Car(strInfo);
+            }
+            catch (FormatException ex)
+            {
+                throw new FormatException($"One or more values in the input string are not in the correct format. Details: {ex.Message}", ex);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException($"One or more values in the input string are invalid. Details: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"An unexpected error occurred while parsing the Car object. Details: {ex.Message}", ex);
+            }
+        }
+
+        static public bool TryParse(string strInfo, out Car car)
+        {
+            try
+            {
+                car = Car.Parse(strInfo);
+                return true;
+            }
+            catch
+            {
+                car = null;
+                return false;
+            }
+        }
+
         public string StartEnige()
         {
             if (_isStarted)
@@ -375,6 +478,11 @@
                 _milage += actualDistancePossible;
                 _currentFuel = 0;
                 StopEngine();
+
+                _totalMilage += actualDistancePossible;
+                _totalConsumedFuelPrice += actualDistancePossible * _fuelConsumptionPer100km / 100.0;
+                _totalFuelConsumption += actualDistancePossible;
+
                 return $"Ran out of fuel after driving for {actualTimePossible:F2} minutes and {actualDistancePossible:F2} km. " +
                        $"The car stopped. Total milage: {_milage:F2} km. Please refuel.";
             }
@@ -382,6 +490,11 @@
             {
                 _currentFuel -= fuelConsumed;
                 _milage += distanceDrivenKM;
+
+                _totalMilage += distanceDrivenKM;
+                _totalConsumedFuelPrice += distanceDrivenKM * _fuelConsumptionPer100km / 100.0;
+                _totalFuelConsumption += distanceDrivenKM;
+
                 return $"Drove for {timeInMinutes:F2} minutes ({distanceDrivenKM:F2} km) at {_currentSpeed:F2} km/h. " +
                        $"Fuel consumed: {fuelConsumed:F2} liters. Remaining fuel: {_currentFuel:F2} / {_fuelCapacity} liters. " +
                        $"Total milage: {_milage:F2} km.";

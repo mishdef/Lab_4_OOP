@@ -25,9 +25,10 @@ namespace Lab_4
                     Console.WriteLine("3. Search car");
                     Console.WriteLine("4. Demonstrate behaviour");
                     Console.WriteLine("5. Delete car");
+                    Console.WriteLine("6. Demonstrate static methods");
                     Console.WriteLine("0. Exit");
 
-                    int choice = InputInt("MAIN MENU: Choose an option: ", InputType.With, -1, 5); //-1 to add seed data
+                    int choice = InputInt("MAIN MENU: Choose an option: ", InputType.With, -1, 6); //-1 to add seed data
 
                     switch (choice)
                     {
@@ -46,7 +47,9 @@ namespace Lab_4
                         case 5:
                             RemoveCar();
                             break;
-
+                        case 6:
+                            DemonstrateStaticMethods();
+                            break;
                         case -1:
                             AddSeedData();
                             break;
@@ -60,6 +63,51 @@ namespace Lab_4
                     Console.WriteLine("ERROR: " + ex.Message);
                 }
             } while (true);
+        }
+
+        static void DemonstrateStaticMethods()
+        {
+            try
+            {
+                switch(Menu.DisplayMenu("Static Menu", new[] {
+                    "Show statistics", 
+                    "Show fuel price", 
+                    "Change fuel price", 
+                    "Show count", 
+                    "Reset statistics"}, 
+                    allowLooping: true))
+                {
+                    case 0:
+                        Console.WriteLine(Car.ShowCountres());
+                        break;
+                    case 1:
+                        Console.WriteLine($"Fuel price: {Car.FuelPrice}$ per liter.");
+                        break;
+                    case 2:
+                        do
+                        {
+                            try
+                            {
+                                int newPrice = InputInt("Enter new fuel price: ");
+                                Car.FuelPrice = newPrice;
+                                break;
+                            }catch (Exception ex) {
+                                Console.WriteLine(ex.Message);
+                            }
+                        } while (true);
+                        break;
+                    case 3:
+                        Console.WriteLine($"Total cars count: {Car.Count}");
+                        break;
+                    case 4:
+                        Car.ResetCountres();
+                        Console.WriteLine("Statistics cleared.");
+                        break;
+                }
+            }catch(Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+            }
         }
 
         static public void AddSeedData() //cheat code
@@ -292,27 +340,16 @@ namespace Lab_4
             {
                 string data = InputString("Enter string data: ");
 
-                Car temp = null;
-
-                try
-                {
-                    temp = new Car(data);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error creating car from string data: " + ex.Message);
-                    return;
-                }
-                if (temp != null)
+                Car temp;
+                if (Car.TryParse(data, out temp))
                 {
                     Array.Resize(ref cars, cars.Length + 1);
                     cars[cars.Length - 1] = temp;
-
-                    Console.WriteLine("Car added successfully.");
+                    Console.WriteLine("Car added successfully using TryParse.");
                 }
                 else
                 {
-                    Console.WriteLine("Error creating car from string data.");
+                    Console.WriteLine("Error creating car from string data. Please check the format.");
                 }
             }
             else if (choice == 3)
@@ -378,19 +415,7 @@ namespace Lab_4
         {
             Array.Resize(ref cars, cars.Length + 1);
 
-            cars[cars.Length - 1] = new Car
-            {
-                Mark = mark,
-                Model = model,
-                Color = color,
-                HorsePower = horsePower,
-                Weight = weight,
-                Milage = milage,
-                FuelConsumptionPer100km = fuelConsumption,
-                FuelCapacity = fuelCapacity,
-                ProductionDate = productiDate,
-                NumberOfDoors = numberOfDoors
-            };
+            cars[cars.Length - 1] = new Car(mark, model, color, horsePower, weight, milage, fuelCapacity, productiDate, fuelConsumption, numberOfDoors);
 
             return "Car added successfully";
         }
@@ -408,6 +433,7 @@ namespace Lab_4
             {
                 PrintCarLine(i + 1, cars[i]);
             }
+            Console.WriteLine($"Total number of correctly created cars: {Car.Count}");
         }
 
         static void SearchCars()

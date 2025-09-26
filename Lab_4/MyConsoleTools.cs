@@ -336,7 +336,6 @@ namespace MyFunctions
             {
                 Console.SetCursorPosition(0, menuStartLine + items.Length);
                 Console.WriteLine("\nUse arrow keys to navigate, Enter to select.");
-                Console.WriteLine("Or press the number of menu item.");
                 if (items.Length > 9)
                 {
                     Console.WriteLine("Selection by number is disabled for more than 9 items.");
@@ -400,13 +399,16 @@ namespace MyFunctions
                 {
                     Console.CursorVisible = true;
                     Console.SetCursorPosition(0, finalCursorPositionAfterMenu);
+                    Console.WriteLine(" -> Enter");
                     Console.WriteLine();
+
                     return selectedIndex;
                 }
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     Console.CursorVisible = true;
-                    Console.Clear();
+                    Console.SetCursorPosition(0, finalCursorPositionAfterMenu);
+                    Console.WriteLine(" -> Esc");
                     return -1;
                 }
                 else if (char.IsDigit(keyInfo.KeyChar))
