@@ -67,47 +67,58 @@ namespace Lab_4
 
         static void DemonstrateStaticMethods()
         {
-            try
+            do
             {
-                switch(Menu.DisplayMenu("Static Menu", new[] {
-                    "Show statistics", 
-                    "Show fuel price", 
-                    "Change fuel price", 
-                    "Show count", 
-                    "Reset statistics"}, 
-                    allowLooping: true))
+                MessageBox.BoxItem("   Static Menu   ");
+                Console.WriteLine("1. Show statistics");
+                Console.WriteLine("2. Show fuel price");
+                Console.WriteLine("3. Change fuel price");
+                Console.WriteLine("4. Show count");
+                Console.WriteLine("5. Reset statistics");
+                Console.WriteLine("0. Back to main menu\n");
+
+
+                try
                 {
-                    case 0:
-                        Console.WriteLine(Car.ShowCountres());
-                        break;
-                    case 1:
-                        Console.WriteLine($"Fuel price: {Car.FuelPrice}$ per liter.");
-                        break;
-                    case 2:
-                        do
-                        {
-                            try
+                    switch (InputInt("STATIC MENU: Choose an option: ", InputType.With, 0, 5))
+                    {
+                        case 0:
+                            return;
+                        case 1:
+                            Console.WriteLine(Car.ShowCountres());
+                            break;
+                        case 2:
+                            Console.WriteLine($"Fuel price: {Car.FuelPrice}$ per liter.");
+                            break;
+                        case 3:
+                            do
                             {
-                                int newPrice = InputInt("Enter new fuel price: ");
-                                Car.FuelPrice = newPrice;
-                                break;
-                            }catch (Exception ex) {
-                                Console.WriteLine(ex.Message);
-                            }
-                        } while (true);
-                        break;
-                    case 3:
-                        Console.WriteLine($"Total cars count: {Car.Count}");
-                        break;
-                    case 4:
-                        Car.ResetCountres();
-                        Console.WriteLine("Statistics cleared.");
-                        break;
+                                try
+                                {
+                                    int newPrice = InputInt("Enter new fuel price: ");
+                                    Car.FuelPrice = newPrice;
+                                    break;
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.Message);
+                                }
+                            } while (true);
+                            break;
+                        case 4:
+                            Console.WriteLine($"Total cars count: {Car.Count}");
+                            break;
+                        case 5:
+                            Car.ResetCountres();
+                            Console.WriteLine("Statistics cleared.");
+                            break;
+                    }
                 }
-            }catch(Exception ex)
-            {
-                Console.WriteLine("ERROR: " + ex.Message);
-            }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR: " + ex.Message);
+                }
+            }while (true);
         }
 
         static public void AddSeedData() //cheat code
@@ -564,6 +575,7 @@ namespace Lab_4
             }
 
             Array.Resize(ref cars, cars.Length - itemsRemovedCount);
+            Car.Count -= itemsRemovedCount;
 
             MessageBox.Show($"Removed the following cars: {removedNamesString}. Total cars remaining: {cars.Length}");
         }
@@ -629,7 +641,7 @@ namespace Lab_4
                             Console.WriteLine(carSel.Refuel(fuel));
                             break;
                         case 9:
-                            Console.WriteLine("Car data: " + carSel.ToExportString());
+                            Console.WriteLine("Car data: " + carSel.ToString());
                             break;
                         case 0:
                             Console.WriteLine("Returning to main menu...");

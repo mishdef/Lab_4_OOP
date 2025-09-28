@@ -35,8 +35,7 @@ namespace Lab_4
         #region Properties
 
         //newwwwwwwwwwwww
-        public static int Count { get { return _count; } }
-
+        public static int Count { get { return _count; } set { _count = value; } }
         public static double TotalMilage { get { return _totalMilage; } }
         public static double TotalFuelConsumption { get { return _totalFuelConsumption; } }
         public static double TotalConsumedFuel { get { return _totalFuelConsumption; } }
@@ -245,22 +244,22 @@ namespace Lab_4
             _count++;
         }
 
-        private Car(string strInfo)
-        {
-            var info = strInfo.Split('╬', StringSplitOptions.RemoveEmptyEntries).ToArray();
-            Mark = info[0];
-            Model = info[1];
-            Color = (Color)int.Parse(info[2]);
-            HorsePower = float.Parse(info[3]);
-            Weight = decimal.Parse(info[4]);
-            Milage = double.Parse(info[5]);
-            FuelCapacity = double.Parse(info[6]);
-            ProductionDate = DateTime.Parse(info[7]);
-            FuelConsumptionPer100km = double.Parse(info[8]);
-            NumberOfDoors = int.Parse(info[9]);
+        //private Car(string strInfo)
+        //{
+        //    var info = strInfo.Split('╬', StringSplitOptions.RemoveEmptyEntries).ToArray();
+        //    Mark = info[0];
+        //    Model = info[1];
+        //    Color = (Color)int.Parse(info[2]);
+        //    HorsePower = float.Parse(info[3]);
+        //    Weight = decimal.Parse(info[4]);
+        //    Milage = double.Parse(info[5]);
+        //    FuelCapacity = double.Parse(info[6]);
+        //    ProductionDate = DateTime.Parse(info[7]);
+        //    FuelConsumptionPer100km = double.Parse(info[8]);
+        //    NumberOfDoors = int.Parse(info[9]);
 
-            _count++;
-        }
+        //    _count++;
+        //}
         #endregion
 
         #region Methods
@@ -285,16 +284,18 @@ namespace Lab_4
             {
                 throw new ArgumentException("Invalid string. Cannot be parsed to Car object.");
             }
-            if (strInfo.Split('╬').Length != 10)
+
+            var info = strInfo.Split(';', StringSplitOptions.RemoveEmptyEntries).ToArray();
+
+            if (info.Length != 10)
             {
                 throw new ArgumentException("Invalid string. Cannot be parsed to Car object.");
             }
 
 
-
             try
             {
-                return new Car(strInfo);
+                return new Car(info[0], info[1], (Color)int.Parse(info[2]), float.Parse(info[3]), decimal.Parse(info[4]), double.Parse(info[5]), double.Parse(info[6]), DateTime.Parse(info[7]), double.Parse(info[8]), int.Parse(info[9]));
             }
             catch (FormatException ex)
             {
@@ -501,12 +502,12 @@ namespace Lab_4
             }
         }
 
-        public string ToExportString()
+        public override string ToString()
         {
-            return $"{Mark}╬{Model}╬{(int)Color}╬{HorsePower}╬{Weight}╬{Milage}╬{FuelCapacity}╬{ProductionDate}╬{FuelConsumptionPer100km}╬{NumberOfDoors}";
+            return $"{Mark};{Model};{(int)Color};{HorsePower};{Weight};{Milage};{FuelCapacity};{ProductionDate};{FuelConsumptionPer100km};{NumberOfDoors}";
         }
 
-        public override string ToString()
+        public string ToDisplayString()
         {
             return $"Car: {MarkAndModel}, Color: {Color}, HorsePower: {HorsePower}, Weight: {Weight}, Milage: {Milage:F2} km, CurrentSpeed: {CurrentSpeed:F2} km/h ," +
                   $"MaxSpeed: {MaxSpeed:F2} km/h, Fuel: {CurrentFuel:F2}/{FuelCapacity} liters. Fuel per 100km: {FuelConsumptionPer100km:F2} liters.";
